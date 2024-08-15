@@ -52,7 +52,7 @@ def plot_clusters_with_radii(points, labels, cluster_centers, radii):
 # Função principal
 def kmeans_clustering(file_path):
     # Defina o número de clusters
-    n_clusters = 6  # Alterar o número de clusters conforme desejado
+    n_clusters = 3  # Alterar o número de clusters conforme desejado
     
     # Ler pontos e rótulos verdadeiros do arquivo
     points, true_labels = read_points_and_labels_from_txt(file_path)

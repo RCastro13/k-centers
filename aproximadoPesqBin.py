@@ -7,7 +7,7 @@ import sys
 
 # Função de distância de Minkowski
 def minkowski(p1, p2):
-    p=1
+    p=2
     p1 = np.array(p1)
     p2 = np.array(p2)
     result = np.sum(np.abs(p1 - p2) ** p)
@@ -65,7 +65,7 @@ def main(filename):
     rmax = max_dist(data[:, :2])
     print('rmax:', rmax)
     C = []
-    percent = 0.08
+    percent = 0.16
     for i in range(30):
         print(f"\nExecução {i+1}/30")
 
@@ -124,7 +124,7 @@ def main(filename):
         # Salvar resultados em um arquivo .txt
         result_file = 'resultados.txt'
         with open(result_file, 'a') as file:
-            file.write(f"{algoritmo}\t{k}\t1\t{instancia}\t{execution_time:.4f}\t{radius:.4f}\t{silhouette_avg:.4f}\t{rand:.4f}\t{percent}\n")
+            file.write(f"{algoritmo}\t{k}\t2\t{instancia}\t{execution_time:.4f}\t{radius:.4f}\t{silhouette_avg:.4f}\t{rand:.4f}\t{percent}\n")
 
         # Plotar os clusters e centros (apenas na última execução)
         if i == 29:

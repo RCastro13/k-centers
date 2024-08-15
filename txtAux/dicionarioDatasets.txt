@@ -4,6 +4,8 @@ Variaveis usadas: Area e Perimeter
 TAMANHO:
 CENTROS: 2
 
+Rice (Cammeo and Osmancik)
+
 https://archive.ics.uci.edu/dataset/544/estimation+of+obesity+levels+based+on+eating+habits+and+physical+condition
 Variaveis usadas: Age e Height
 TAMANHO:
@@ -19,6 +21,8 @@ Variaveis usadas: mcg e gvh
 TAMANHO:
 CENTROS: 10
 
+Yeast
+
 https://archive.ics.uci.edu/dataset/267/banknote+authentication
 Variaveis usadas: variance e skewness
 TAMANHO:
@@ -29,15 +33,21 @@ Variaveis usadas: Attribute1 e attribute2
 TAMANHO:
 CENTROS: 3
 
+Waveform Database Generator (Version 1)
+
 https://archive.ics.uci.edu/dataset/146/statlog+landsat+satellite
 Variaveis usadas: Attribute31 e attribute32
 TAMANHO:
 CENTROS: 6
 
+Statlog (Landsat Satellite)
+
 https://archive.ics.uci.edu/dataset/144/statlog+german+credit+data
 Variaveis usadas: Attribute2 e attribute13
 TAMANHO:
 CENTROS: 2
+
+Statlog (German Credit Data)
 
 https://archive.ics.uci.edu/dataset/3/annealing
 Variaveis Usadas: thick e width
@@ -48,3 +58,8 @@ https://archive.ics.uci.edu/dataset/186/wine+quality
 Variaveis Usadas: chlorides e pH
 TAMANHO:
 CENTROS: 7
+
+
+Wine Quality
+
+

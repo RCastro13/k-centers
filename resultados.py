@@ -34,4 +34,8 @@ def criar_dataset(arquivo_txt):
 # Exemplo de uso
 arquivo_txt = 'resultados.txt'  # Caminho para o arquivo .txt
 df = criar_dataset(arquivo_txt)
-print(df)
+dfGuloso = df.query('algoritmo == 1')
+dfAproxRaio = df.query('algoritmo == 2')
+dfKMeans = df.query('algoritmo == 3')
+
+print(dfGuloso)
