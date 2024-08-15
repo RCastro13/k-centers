@@ -1,116 +1,110 @@
-import matplotlib.pyplot as plt
 import numpy as np
-import random
+import time
+import argparse
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score, adjusted_rand_score, rand_score
+from scipy.spatial.distance import cdist
 
-##############################################
-#PSEUDO-CÓDIGO
-#Se k ≥ |S|, retorne S
-#• Senão, selecione s arbitrário e crie C={s}
-#• Enquanto |C| < k
-#•  Selecione s que maximize dist(s,C)
-#•  Adicione s a C
-#• Retorne C
-##############################################
+# Função para ler os pontos de um arquivo .txt, incluindo os labels verdadeiros
+def read_points_and_labels_from_txt(file_path):
+    points = []
+    true_labels = []
+    with open(file_path, 'r') as file:
+        for line in file:
+            x, y, label = map(float, line.strip().split())
+            points.append([x, y])
+            true_labels.append(int(label))  # Armazena os rótulos verdadeiros como inteiros
+    return np.array(points), np.array(true_labels)
 
-#função de distância de Minkowski
-def minkowski(p1, p2, p):
-    p1 = np.array(p1)
-    p2 = np.array(p2)
-    result = np.sum(np.abs(p1 - p2) ** p)
-    return result ** (1 / p)
+# Função para calcular os raios dos clusters
+def calculate_cluster_radii(points, labels, cluster_centers):
+    radii = []
+    for i, center in enumerate(cluster_centers):
+        # Seleciona os pontos do cluster i
+        cluster_points = points[labels == i]
+        # Calcula a distância de cada ponto do cluster ao centro do cluster
+        distances = np.linalg.norm(cluster_points - center, axis=1)
+        # O raio é a distância máxima do ponto mais distante
+        radii.append(np.max(distances))
+    return radii
 
-#ler dados do arquivo
-filename = 'samples/sample_moons2.txt'
-data = np.loadtxt(filename)
+# Função para plotar os clusters e os raios
+def plot_clusters_with_radii(points, labels, cluster_centers, radii):
+    fig, ax = plt.subplots()
+    
+    # Plotar pontos e centros dos clusters
+    scatter = ax.scatter(points[:, 0], points[:, 1], c=labels, cmap='viridis', marker='o', s=50, alpha=0.6, edgecolor='k')
+    ax.scatter(cluster_centers[:, 0], cluster_centers[:, 1], c='red', marker='x', s=200, label='Centros')
 
-x = data[:, 0]
-y = data[:, 1]
+    # Adicionar círculos com o raio dos clusters
+    for i, (center, radius) in enumerate(zip(cluster_centers, radii)):
+        circle = plt.Circle(center, radius, color='r', fill=False, linestyle='--', label=f'Raio Cluster {i+1}')
+        ax.add_artist(circle)
 
-#normalização usando Min-Max Scaling
-#x = (x - x.min()) / (x.max() - x.min())
-#y = (y - y.min()) / (y.max() - y.min())
+    # Definições adicionais para o gráfico
+    ax.set_title("K-Means Clustering com Raios dos Clusters")
+    ax.set_xlabel("X")
+    ax.set_ylabel("Y")
+    ax.legend()
+    plt.show()
 
-#inicialização
-used = [False for _ in range(len(x))]
-centers_x = []
-centers_y = []
+# Função principal
+def kmeans_clustering(file_path):
+    # Defina o número de clusters
+    n_clusters = 6  # Alterar o número de clusters conforme desejado
+    
+    # Ler pontos e rótulos verdadeiros do arquivo
+    points, true_labels = read_points_and_labels_from_txt(file_path)
+    
+    # Aplicar o algoritmo de KMeans
+    start_time = time.time()
+    kmeans = KMeans(n_clusters=n_clusters, random_state=0).fit(points)
+    execution_time = time.time() - start_time
+    
+    # Previsões do KMeans
+    predicted_labels = kmeans.labels_
+    cluster_centers = kmeans.cluster_centers_
+    
+    # Cálculo da silhueta
+    silhouette_avg = silhouette_score(points, predicted_labels)
+    
+    # Cálculo do Índice de Rand Ajustado usando os rótulos verdadeiros e os rótulos previstos pelo KMeans
+    rand_score_val = adjusted_rand_score(true_labels, predicted_labels)
+    
+    # Cálculo dos raios dos clusters
+    radii = calculate_cluster_radii(points, predicted_labels, cluster_centers)
+    
+    # Impressão dos resultados
+    print(f"Tempo de execução: {execution_time:.4f} segundos")
+    print(f"Silhueta média: {silhouette_avg:.4f}")
+    print(f"Índice de Rand Ajustado: {rand_score_val:.4f}")
+    
+    # Imprimir o maior raio entre os clusters
+    max_radius = max(radii)
+    print(f"Maior raio encontrado: {max_radius:.4f}")
 
-#tentativa com 2 centros
-k = 2
+    result_file = 'resultados.txt'
+    empty = 0
+    algoritmo = 3
+    k = n_clusters
+    instancia = file_path
+    radius = max_radius
+    with open(result_file, 'a') as file:
+        file.write(f"{algoritmo}\t{k}\t0\t{instancia}\t{execution_time:.4f}\t{radius:.4f}\t{silhouette_avg:.4f}\t{rand_score_val:.4f}\t{empty}\n")
+    
+    # Plotar clusters com raios
+    plot_clusters_with_radii(points, predicted_labels, cluster_centers, radii)
 
-#escolher o primeiro centro arbitrariamente
-C = [random.randint(0, len(x) - 1)]
-
-#algoritmo guloso de k-centros 2-aproximado (segundo algoritmo ensinado)
-while len(C) < k:
-    s = -1
-    max_dist = -1
-    for i in range(len(x)):
-        if used[i]:
-            continue
-        min_dist = float('inf')
-        for j in C:
-            dist = minkowski([x[i], y[i]], [x[j], y[j]], 2)
-            if dist < min_dist:
-                min_dist = dist
-        #procurando a maior distância entre um ponto e seu centro mais próximo
-        if min_dist > max_dist:
-            max_dist = min_dist
-            s = i
-    #quando encontrar, salva
-    C.append(s)
-    used[s] = True
-
-for i in C:
-    centers_x.append(x[i])
-    centers_y.append(y[i])
-
-centers_x = np.array(centers_x)
-centers_y = np.array(centers_y)
-
-#calcula o raio da solução
-def calculate_solution_radius(points, centers, p):
-    max_radius = 0
-    for point in points:
-        min_distance = float('inf')
-        for center in centers:
-            dist = minkowski(point, center, p)
-            if dist < min_distance:
-                min_distance = dist
-        if min_distance > max_radius:
-            max_radius = min_distance
-    return max_radius
-
-points = list(zip(x, y))
-centers = list(zip(centers_x, centers_y))
-radius = calculate_solution_radius(points, centers, 2)
-print(f"Raio da solução: {radius}")
-
-#atribuir cores diferentes aos pontos de cada cluster
-def assign_clusters(points, centers):
-    labels = []
-    for point in points:
-        min_distance = float('inf')
-        cluster_label = -1
-        for i, center in enumerate(centers):
-            dist = minkowski(point, center, 2)
-            if dist < min_distance:
-                min_distance = dist
-                cluster_label = i
-        labels.append(cluster_label)
-    return np.array(labels)
-
-labels = assign_clusters(points, centers)
-
-#plot
-plt.figure(figsize=(8, 6))
-scatter = plt.scatter(x, y, c=labels, cmap='viridis', edgecolor='k')
-plt.scatter(centers_x, centers_y, color='red', marker='x', s=100, label='Centros')
-
-plt.title('Clusters e Centros')
-plt.xlabel('Feature 1')
-plt.ylabel('Feature 2')
-plt.legend()
-plt.colorbar(scatter, label='Cluster ID')
-
-plt.show()
+if __name__ == '__main__':
+    # Definindo o parser de argumentos
+    parser = argparse.ArgumentParser(description="K-Means clustering para pontos de um arquivo .txt")
+    
+    # Argumento: caminho do arquivo
+    parser.add_argument('file_path', type=str, help="Caminho para o arquivo .txt contendo os pontos e os rótulos")
+    
+    # Parseando os argumentos
+    args = parser.parse_args()
+    
+    # Executar a função de clustering
+    kmeans_clustering(args.file_path)
