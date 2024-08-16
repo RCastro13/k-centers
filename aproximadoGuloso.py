@@ -37,7 +37,7 @@ for iteration in range(30):
     centers_y = []
 
     # Quantidade de centros
-    k = 5
+    k = 10
     p = 2
     # Escolher o primeiro centro arbitrariamente
     C = [random.randint(0, len(x) - 1)]
@@ -132,4 +132,4 @@ plt.ylabel('Feature 2')
 plt.legend()
 plt.colorbar(scatter, label='Cluster ID')
 
-#plt.show()
+plt.show()

@@ -60,7 +60,7 @@ def main(filename):
     y = data[:, 1]
     true_labels = data[:, 2]  # Lendo os rótulos verdadeiros da terceira coluna
     # Inicialização
-    k = 3
+    k = 5
     #p = 2  # Parâmetro da distância de Minkowski
     rmax = max_dist(data[:, :2])
     print('rmax:', rmax)
@@ -136,7 +136,7 @@ def main(filename):
             plt.ylabel('Feature 2')
             plt.legend()
             plt.colorbar(scatter, label='Cluster ID')
-            #plt.show()
+            plt.show()
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
