@@ -39,3 +39,5 @@ dfAproxRaio = df.query('algoritmo == 2')
 dfKMeans = df.query('algoritmo == 3')
 
 print(dfGuloso)
+
+#CONTINUAÇÃO NO .IPYNB
